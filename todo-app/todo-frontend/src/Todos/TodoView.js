@@ -8,8 +8,12 @@ const TodoView = () => {
   const [todos, setTodos] = useState([])
 
   const refreshTodos = async () => {
-    const { data } = await axios.get('/todos')
-    setTodos(data)
+    try {
+      const { data } = await axios.get('/todos')
+      setTodos(data)
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   useEffect(() => {
