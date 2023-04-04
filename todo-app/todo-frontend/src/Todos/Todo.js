@@ -1,7 +1,4 @@
 const Todo = ({ todo, doneInfo, notDoneInfo }) => {
-    console.log(todo.text)
-
-
 
     return (
     <>

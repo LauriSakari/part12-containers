@@ -8,7 +8,7 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
-      MONGO_INITDB_DATABASE: the_database
+      MONGO_INITDB_DATABASE: the_production_database
     volumes: 
       - ./todo-backend/mongo/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js
       - ./todo-backend/mongo_data:/data/db
@@ -21,15 +21,13 @@ services:
     volumes:
       - ./todo-backend/redis_data:/data
   
-  backend:
-    image: backend
+  backend-production:
+    image: backend-production
     build:
       context: todo-backend
-      dockerfile: dev.Dockerfile
+      dockerfile: Dockerfile
     volumes:
       - ./todo-backend:/usr/src/app
-    ports:
-      - 3001:3001
     environment: 
       - REDIS_URL=redis://redis:6379
       - MONGO_URL=mongodb://the_username:the_password@mongo:27017/the_database
@@ -37,26 +35,22 @@ services:
       - mongo
       - redis
   
-  frontend:
-    image: frontend
+  frontend-production:
+    image: frontend-production
     build:
       context: todo-frontend
-      dockerfile: dev.Dockerfile 
+      dockerfile: Dockerfile 
     volumes:
       - ./todo-frontend:/usr/src/app
-    ports:
-      - 3000:3000
-    environment:
-      - REACT_APP_BACKEND_URL=http://localhost:8080/api
     depends_on:
-      - backend
+      - backend-production
   
   nginx:
     image: nginx:1.20.1
     volumes:
-      - ./nginx.dev.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
     ports:
       - 8080:80
     container_name: reverse-proxy
     depends_on:
-      - frontend
+      - frontend-production
