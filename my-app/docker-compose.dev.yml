@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+
+  backend:
+    image: backend
+    build:
+      context: bloglist-backend
+      dockerfile: dev.Dockerfile
+    volumes:
+      - ./bloglist-backend:/usr/src/app
+      - node_modules:/usr/src/app/node_modules
+
+  frontend:
+    image: frontend    
+    build:
+      context: bloglist-frontend 
+      dockerfile: dev.Dockerfile 
+    volumes:
+      - ./bloglist-frontend:/usr/src/app 
+    environment:
+      - DANGEROUSLY_DISABLE_HOST_CHECK=true
+    depends_on:
+      - backend
+
+  nginx:
+    image: nginx:1.20.1
+    volumes:
+      - ./nginx.dev.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - 8080:80
+    container_name: reverse-proxy
+    depends_on:
+      - frontend
+
+volumes:
+  node_modules:
